@@ -123,27 +123,23 @@ void loop() {
 }
 
 void Calculation(int mode1, int low, int high){
-    int count = 0;
     int pin = low;
-    String upstreamStr;
     if (mode1 == 0){
       for (int i = 0; i < 8; i++){ //Read channel 0-7 of the central mux
         for (int j = 0; j < 16; j++){
           for (int sel = 0; sel < 4; sel++){ //Control the channel of the connecting mux
             digitalWrite(auxPins[sel],myChannel[j][sel]);
           }
-          //Serial.print("Pin ");
-          upstreamStr += pin;
-          upstreamStr += ":";
           for (int k = 0; k < 50; k++){ //Take reading of the value 50 times and take the average
             values[k] = (readChannel(i));
             sum += values[k];
           }
           average = sum/50;
           sum = 0; //clear the sum
-          upstreamStr += (average);
-          upstreamStr += "&";        
-          count = count + 2;
+          Serial.print(pin);
+          Serial.print(":");
+          Serial.print(average);
+          Serial.print("&");         
           pin++;    
         }
       }  
@@ -186,7 +182,6 @@ void Calculation(int mode1, int low, int high){
             sum = 0;
             Serial.print(average);
             Serial.print("&");                 
-            count = count + 2;
             pin++;    
          }
          setLow = 0;
@@ -216,14 +211,12 @@ void Calculation(int mode1, int low, int high){
         }
         average = sum/50;
         sum = 0;
-        upstreamStr += pin;
-        upstreamStr += ":";
-        upstreamStr += average;
-        upstreamStr += "&";
+        Serial.print(pin);
+        Serial.print(":");
+        Serial.print(average);
+        Serial.print("&"); 
         delay(1);
       } 
     }
-
-    Serial.print(upstreamStr);
 }
 
