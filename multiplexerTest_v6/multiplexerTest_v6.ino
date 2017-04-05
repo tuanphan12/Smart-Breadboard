@@ -1,3 +1,5 @@
+elapsedMillis timeElapsed;
+
 int centralPins[] = {12,11,10,9};
 int auxPins[] = {8,7,6,5};
 int SIG_pin = A0;
@@ -71,14 +73,16 @@ int loopCounter = 0;
 int maxSkip = 1000;
 
 void loop() {
-  // put your main code here, to run repeatedly:
   if (loopCounter == maxSkip){
-    Serial.print(upstreamStr);
+    Serial.println(upstreamStr);
+    Serial.println(timeElapsed);
     loopCounter = 0;
+    timeElapsed = 0;
     upstreamStr = "";   //empty the sent string so no addition information will be overlap
   }
   else{
     loopCounter += 1;
+    delay(1);
   }
   //delay(2000);  //must have a delay here for communication....
   //Serial.print(upstreamStr);
@@ -89,29 +93,37 @@ void loop() {
         Calculation(mode,0,0); 
     }
 
-    //format of reading a single node for a lengt of time: nodeindex,timeinsec; + "single"
-    else if (commandString.substring(0) == "single"){
-        int node_pos;
-        int t;
-        String temp;
-        mode = 2;
-        for (int h = 0; h < commandString.length(); h++) {
-          if (commandString[h] == ';'){
-            break;
-          }
-          else if (commandString[h] == ','){
-            node_pos = t;
-            temp = ""; //empty
-          }
-          else{
-            temp += commandString[h];
-            t = (temp.toInt());
-          }
-        }
-        Calculation(mode,node_pos,t);
+    else if (commandString.equalsIgnoreCase("off")){
+      digitalWrite(EN_pin,HIGH);
     }
 
-    //format of reading a range of nodes: firstnodeindex,secondnodeindex
+    else if (commandString.equalsIgnoreCase("on")){
+      digitalWrite(EN_pin,LOW);
+    }
+  
+//    //format of reading a single node for a lengt of time: nodeindex,samplingrate; + "single"
+//    else if (commandString.substring(0) == "single"){
+//        int node_pos;
+//        int sampling_rate;
+//        String temp;
+//        mode = 2;
+//        for (int h = 0; h < commandString.length(); h++) {
+//          if (commandString[h] == '#'){
+//            break;
+//          }
+//          else if (commandString[h] == ','){
+//            node_pos = sampling_rate;
+//            temp = ""; //empty
+//          }
+//          else{
+//            temp += commandString[h];
+//            sampling_rate = (temp.toInt());
+//          }
+//        }
+//        Calculation(mode,node_pos,sampling_rate);
+//    }
+
+    //format of reading a range of nodes: nodeindex,samplingrate
     else{
       int lRange = 0;
       int hRange = 0;
@@ -128,16 +140,15 @@ void loop() {
       }
       mode = 1;
       Calculation(mode,lRange,hRange);
-      //Serial.println(lRange);
-      //Serial.println(hRange);
     }
-    //Serial.println(commandString);
     commandString = "";
     stringComplete = false;
   }
 }
 
 void Calculation(int mode1, int low, int high){
+    //Serial.println(low);
+    //Serial.println(high);
     int pin = low;
     if (mode1 == 0){
       for (int i = 0; i < 8; i++){ //Read channel 0-7 of the central mux
@@ -154,68 +165,19 @@ void Calculation(int mode1, int low, int high){
           upstreamStr += pin;
           upstreamStr += ":";
           upstreamStr += average;
-          upstreamStr += "&";
-//          Serial.print(pin);
-//          Serial.print(":");
-//          Serial.print(average);
-//          Serial.print("&");         
+          upstreamStr += "&";       
           pin++;    
         }
       }  
     }
-        
-    if (mode1 == 1){
-      int tempInt;
-      int setLow;
-      int cycle = int(high/16);  //total number of cycle 
-      int start_mux = int(low/16); //initial starting mux
-      if (high < 16){
-        tempInt = high;
-      }
-      else{
-        tempInt = 15;
-      }
 
-      if (low < 16){
-        setLow = low;
-      }
-      else{
-        setLow = low - (start_mux*16);
-      }
-          
-      int turn = start_mux + 1;  //keep track of how many times the function loop
-      //   Serial.print(start_mux);
-      //   Serial.println(cycle);
-      for (int i = start_mux; i < (cycle+1); i++){ //Read channel 0-7 of the central mux
-         for (int j = setLow; j < (tempInt+1); j++){ //Read channels from 0 - 15
-            for (int sel = 0; sel < 4; sel++){ //Control the channel of the connecting mux
-              digitalWrite(auxPins[sel],myChannel[j][sel]);
-            }
-            for (int k = 0; k < 50; k++){ //Take reading of the value 50 times and take the average
-              values[k] = (readChannel(i));
-              sum += values[k];
-            }
-            Serial.print(pin);
-            Serial.print(":");
-            average = sum/50;
-            sum = 0;
-            Serial.print(average);
-            Serial.print("&");                 
-            pin++;    
-         }
-         setLow = 0;
-         if (turn == cycle){
-           tempInt = high-(cycle*16);
-         }
-         else{
-            turn += 1;
-            tempInt = 15;
-         }
-      }
-    }
-
-    if (mode1 = 2){
-      int central_mux_channel, aux_mux_channel;
+    //high is the sampling rate
+    //low is the index of the node
+    if (mode1 = 1){
+      //Serial.println(low);
+      int central_mux_channel, aux_mux_channel,delay_step;
+      int duration = 2; //for 2 seconds
+      delay_step = 1000/high;
       central_mux_channel = low/16;
       aux_mux_channel = low - (central_mux_channel*16);
       //Serial.println(central_mux_channel);
@@ -223,13 +185,17 @@ void Calculation(int mode1, int low, int high){
       for (int sel = 0; sel < 4; sel++){ //Control the channel of the connecting mux
          digitalWrite(auxPins[sel],myChannel[aux_mux_channel][sel]);
       }
-      for (int t = 0; t < (high*1000); t++){
-        average = readChannel(central_mux_channel);
-        Serial.print(pin);
-        Serial.print(":");
-        Serial.print(average);
-        Serial.print("&"); 
-        delay(1);
+      for (int t = 0; t <= duration; t++){
+        for (int s = 0; s < (high); s++){
+          //Serial.println(low);
+          average = readChannel(central_mux_channel);
+          upstreamStr += low;
+          upstreamStr += ":";
+          upstreamStr += average;
+          upstreamStr += "&";
+          //Serial.println(upstreamStr);
+          delay(delay_step);
+        }
       } 
     }
 }

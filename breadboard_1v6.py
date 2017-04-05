@@ -127,7 +127,7 @@ try:
         string_to_write = input() #7,3;single\n" 
         #string_to_write = "all*"
         s.write(bytes(string_to_write,'UTF-8'))
-        time.sleep(1)
+        time.sleep(5)
         no_more_data = False
 
         ##this is a serious cludge:
@@ -144,7 +144,7 @@ try:
 
         print(all_data)
 
-        x = all_data#.split("'")
+        x = all_data
         #x = x[1]
         #print(x)
         x = x.split("&")
@@ -161,9 +161,12 @@ try:
 
         node_voltage = list()
         time_x = list()
-        interval = 0.001
         count = 0
         if "single" in string_to_write:
+            string_to_write = string_to_write.split(",")
+            string_to_write = string_to_write[1]
+            string_to_write = string_to_write.split("*")
+            interval = 1/float(string_to_write[0])
             node_position = bins[0][0]
             for y in bins:
                 node_voltage.append(y[1]*3.3/1023)
