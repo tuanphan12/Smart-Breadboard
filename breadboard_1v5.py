@@ -111,7 +111,8 @@ else:
 
 #replace voltage here so that instead of random array we use the data from a pyserial read.
 ###Have these values come in a correct, ordered way!
-string_to_write = "all\n" #"6,3;single\n" 
+#string_to_write = "all\n"
+string_to_write = "7,3;single\n" 
 s.write(bytes(string_to_write,'UTF-8'))
 time.sleep(1)
 no_more_data = False

@@ -205,12 +205,7 @@ void Calculation(int mode1, int low, int high){
          digitalWrite(auxPins[sel],myChannel[aux_mux_channel][sel]);
       }
       for (int t = 0; t < (high*1000); t++){
-        for (int k = 0; k < 50; k++){ //Take reading of the value 50 times and take the average
-           values[k] = (readChannel(central_mux_channel));
-           sum += values[k];
-        }
-        average = sum/50;
-        sum = 0;
+        average = readChannel(central_mux_channel);
         Serial.print(pin);
         Serial.print(":");
         Serial.print(average);
