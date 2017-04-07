@@ -30,6 +30,9 @@ String commandString;
 boolean stringComplete = false;
 
 String upstreamStr;
+boolean complete = false;
+int lRange = 0;
+int hRange = 0;
 
 void setup() {
   for (int i = 0; i < 4; i++)
@@ -43,6 +46,21 @@ void setup() {
   digitalWrite(EN_pin,LOW); //EN pin 
   Serial.begin(9600);
   commandString.reserve(200);
+}
+
+void loop() {  
+  if (complete == true){
+    Serial.println(upstreamStr);
+    complete = false;
+  }
+  serialEvent();
+  if (stringComplete){
+    processString(commandString);
+    upstreamStr = "";     //empty the sent string so no addition information will be overlap
+    Calculation(mode,lRange,hRange); 
+    commandString = "";
+    stringComplete = false;
+  }
 }
 
 int readChannel(int channel){
@@ -67,38 +85,20 @@ void serialEvent() {
   }
 }
 
-//variables to setup loop control:
-//int loopCounter = 0;
-//int maxSkip = 1000;
-//int timeSet = 1;
-boolean complete = false;
-//elapsedMillis loopControl;
-
-void loop() {  
-  if (complete == true){
-    Serial.println(upstreamStr);
-    complete = false;
+void processString(String pro_String){
+  if (pro_String.equalsIgnoreCase("all")){
+    mode = 1;
   }
-  //delay(2000);  //must have a delay here for communication....
-  serialEvent();
-  if (stringComplete){
-    upstreamStr = "";     //empty the sent string so no addition information will be overlap
-    if (commandString == "all"){
-      mode = 1;
-      Calculation(mode,0,0); 
-    }
-
-    else if (commandString.equalsIgnoreCase("off")){
+  
+  else if (pro_String.equalsIgnoreCase("off")){
       digitalWrite(EN_pin,HIGH);
-    }
+  }
 
-    else if (commandString.equalsIgnoreCase("on")){
-      digitalWrite(EN_pin,LOW);
-    }
-
-    else{
-      int lRange = 0;
-      int hRange = 0;
+  else if (pro_String.equalsIgnoreCase("on")){
+     digitalWrite(EN_pin,LOW);
+  }
+  
+  else{
       String temp;
       for (int h = 0; h < commandString.length(); h++){
         if (commandString[h] == ','){
@@ -111,10 +111,6 @@ void loop() {
         }
       }
       mode = 2;
-      Calculation(mode,lRange,hRange);
-    }
-    commandString = "";
-    stringComplete = false;
   }
 }
 
@@ -140,22 +136,17 @@ void Calculation(int mode1, int low, int high){
           pin++;    
         }
       }
-      complete = true;  
     }
 
     //high is the sampling rate
     //low is the index of the node
     if (mode1 == 2){
-      //Serial.println(low);
-      //unsigned long delay_modifier;
       int central_mux_channel, aux_mux_channel,delay_step;
       int numberOfSamples = 500;   //desired # of samples
       delay_step = 1000000/high;    //(1/f_sampling)
       elapsedMicros delay_modifier;    //keeping track of the delay
       central_mux_channel = low/16;
       aux_mux_channel = low - (central_mux_channel*16);
-      //Serial.println(central_mux_channel);
-      //Serial.println(aux_mux_channel);
       for (int sel = 0; sel < 4; sel++){ //Control the channel of the connecting mux
          digitalWrite(auxPins[sel],myChannel[aux_mux_channel][sel]);
       }
@@ -169,10 +160,10 @@ void Calculation(int mode1, int low, int high){
           upstreamStr += "&";
           sampleI += 1;
           delay_modifier = 0;
-          //Serial.println(upstreamStr);
         }
-      }
-      complete = true;       
+      }      
     }
+
+    complete = true; 
 }
 

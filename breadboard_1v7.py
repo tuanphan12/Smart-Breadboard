@@ -1,6 +1,5 @@
 from collections import OrderedDict
 
-#from bokeh.sampledata import us_counties, unemployment
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.models import HoverTool
 import bokeh
@@ -119,9 +118,6 @@ def color_getter(value,maximum):
     else:
         return "#" +hexval+"0000"
 
-#replace voltage here so that instead of random array we use the data from a pyserial read.
-###Have these values come in a correct, ordered way!
-
 try:
     while True:
         string_to_write = input() #7,3;single\n" 
@@ -181,9 +177,6 @@ try:
             request_2 = input("Show?(y/n): ")
             if request_2 == "y":
                 show(plot)
-            # plt.plot(time_x,node_voltage,'bo')
-            # plt.axis([0,time_x[-1],0,3.3])
-            # plt.show()
         
         else:
             #Reorganizing for the order of the breadboard layout
