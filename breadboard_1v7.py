@@ -174,9 +174,16 @@ try:
                 time_x.append(interval*count)
                 count += 1
             print (time_x.index(time_x[-1]))
-            plt.plot(time_x,node_voltage,'bo')
-            plt.axis([0,time_x[-1],0,3.3])
-            plt.show()
+            output_file("graphic.html")
+            Tools = 'box_zoom,box_select,crosshair,resize,reset'
+            plot = figure(title = "Voltage vs Time",plot_width = 600,plot_height = 600, tools = Tools)
+            plot.line(time_x,node_voltage,line_width=2)
+            request_2 = input("Show?(y/n): ")
+            if request_2 == "y":
+                show(plot)
+            # plt.plot(time_x,node_voltage,'bo')
+            # plt.axis([0,time_x[-1],0,3.3])
+            # plt.show()
         
         else:
             #Reorganizing for the order of the breadboard layout
