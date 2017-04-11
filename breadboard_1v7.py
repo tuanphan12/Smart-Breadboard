@@ -123,7 +123,7 @@ try:
         string_to_write = input() #7,3;single\n" 
         #string_to_write = "all*"
         s.write(bytes(string_to_write,'UTF-8'))
-        time.sleep(5)
+        time.sleep(5)   #time running in the arduino code. Modify if needed
         no_more_data = False
 
         ##this is a serious cludge:
@@ -162,7 +162,8 @@ try:
             string_to_write = string_to_write.split(",")
             string_to_write = string_to_write[1]
             string_to_write = string_to_write.split("*")
-            interval = 1/float(string_to_write[0])
+            sampling_rate = float(string_to_write[0])
+            interval = 1/sampling_rate
             print (interval)
             node_position = bins[0][0]
             for y in bins:
@@ -171,7 +172,7 @@ try:
                 count += 1
             print (time_x.index(time_x[-1]))
             output_file("graphic.html")
-            Tools = 'box_zoom,box_select,crosshair,resize,reset'
+            Tools = 'box_zoom,box_select,crosshair,hover,resize,reset,zoom_out,zoom_in'
             plot = figure(title = "Voltage vs Time",plot_width = 600,plot_height = 600, tools = Tools)
             plot.line(time_x,node_voltage,line_width=2)
             request_2 = input("Show?(y/n): ")
@@ -179,7 +180,6 @@ try:
                 show(plot)
         
         else:
-            #Reorganizing for the order of the breadboard layout
             #Create place holders when all is not called
             #organizing to operate different modes
             old_voltage = [0]*128  #create a list of zeros of 128 elements

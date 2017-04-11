@@ -58,6 +58,8 @@ void loop() {
     processString(commandString);
     upstreamStr = "";     //empty the sent string so no addition information will be overlap
     Calculation(mode,lRange,hRange); 
+    lRange = 0;
+    hRange = 0;
     commandString = "";
     stringComplete = false;
   }
@@ -142,8 +144,9 @@ void Calculation(int mode1, int low, int high){
     //low is the index of the node
     if (mode1 == 2){
       int central_mux_channel, aux_mux_channel,delay_step;
-      int numberOfSamples = 500;   //desired # of samples
-      delay_step = 1000000/high;    //(1/f_sampling)
+      int duration = 2000000;    //desired time to wait to acquire data in us
+      delay_step = (1000000/high);    //(1/f_sampling)
+      int numberOfSamples = duration/delay_step;   //desired # of samples
       elapsedMicros delay_modifier;    //keeping track of the delay
       central_mux_channel = low/16;
       aux_mux_channel = low - (central_mux_channel*16);
