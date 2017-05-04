@@ -1,3 +1,4 @@
+//order: S0,S1,S2,S3
 int centralPins[] = {12,11,10,9};
 int auxPins[] = {8,7,6,5};
 int SIG_pin = A0;
@@ -125,6 +126,7 @@ void Calculation(int mode1, int low, int high){
           for (int sel = 0; sel < 4; sel++){ //Control the channel of the connecting mux
             digitalWrite(auxPins[sel],myChannel[j][sel]);
           }
+          //delay(10);
           for (int k = 0; k < 50; k++){ //Take reading of the value 50 times and take the average
             values[k] = (readChannel(i));
             sum += values[k];

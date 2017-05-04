@@ -123,7 +123,7 @@ try:
         string_to_write = input() #7,3;single\n" 
         #string_to_write = "all*"
         s.write(bytes(string_to_write,'UTF-8'))
-        time.sleep(4)   #time running in the arduino code. Modify if needed
+        time.sleep(5)   #time running in the arduino code. Modify if needed
         no_more_data = False
 
         ##this is a serious cludge:
