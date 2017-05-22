@@ -20,7 +20,7 @@ int myChannel[16][4] = {
   {1,0,0,1}, //channel 9
   {0,1,0,1}, //channel 10
   {1,1,0,1}, //channel 11
-  {1,0,1,1}, //channel 12
+  {0,0,1,1}, //channel 12
   {1,0,1,1}, //channel 13
   {0,1,1,1}, //channel 14
   {1,1,1,1}  //channel 15
