@@ -232,7 +232,7 @@ try:
             )
 
 
-            output_file("bb_test_1.html", title="Breadboard Visualizer v1.0")
+            output_file("bb_test_{}.html".format('06_25_17_LED_and_Simple_Transistor_Amp'), title="Breadboard Visualizer v1.0")
 
             TOOLS="pan,wheel_zoom,box_zoom,reset,hover,save"
 
