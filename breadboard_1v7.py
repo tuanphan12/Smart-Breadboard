@@ -17,6 +17,8 @@ import time
 import matplotlib.pyplot as plt
 import sys
 
+from datetime import datetime
+
 def serial_ports():
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in list(range(256))]
@@ -120,6 +122,8 @@ def color_getter(value,maximum):
 
 try:
     while True:
+        current = datetime.now().isoformat()
+        current = current.replace(":","_")
         string_to_write = input() #7,3;single\n" 
         #string_to_write = "all*"
         s.write(bytes(string_to_write,'UTF-8'))
@@ -232,9 +236,9 @@ try:
             )
 
 
-            output_file("bb_test_{}.html".format('06_25_17_LED_and_Simple_Transistor_Amp'), title="Breadboard Visualizer v1.0")
+            output_file("bb_test_{}.html".format(current), title="Breadboard Visualizer v1.0")
 
-            TOOLS="pan,wheel_zoom,box_zoom,reset,hover,save"
+            TOOLS="hover,save"
 
             p = figure(title="Breadboard Voltages", tools=TOOLS)
             p.toolbar.logo=None

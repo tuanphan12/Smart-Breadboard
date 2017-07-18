@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+  <script src="/static/socket.io.js"></script>
+  <script src="/static/div_render.js" ></script>
+  <link rel="stylesheet" href="/static/gui.css">
+
+
+</head>
+<body>
+<p>Signal below is sent up from Python server via websocket</p>
+  <div >
+    <div id="plotbox"></div>
+
+  </div>
+
+<script>
+var mouseX, mouseY;
+$(document).mousemove(function(e){
+        mouseX = e.pageX;
+        mouseY = e.pageY;
+});
+
+var PLOT_HEIGHT = 200;
+var PLOT_WIDTH = 300;
+var plot;
+var plot2;
+window.onload = function(){
+    var socket = io('http://localhost:3000');
+    var unique = 456;
+    plot = new Div_Render("plotbox",'Boxo',PLOT_WIDTH, PLOT_HEIGHT,unique,socket);
+}
+</script>
+
+</body>
+
+
+</html>
