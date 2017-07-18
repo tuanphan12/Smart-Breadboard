@@ -169,136 +169,29 @@ def dataThread():
     s = serial.Serial(ser)
     print(s)
     print("ALL GOOD")
+    count = 0
     while True:
-        #current = datetime.now().isoformat()
-        #current = current.replace(":","_")
-        #string_to_write = input() #7,3;single\n" 
-        string_to_write = "all*"
-        print(string_to_write)
-
-        s.write(bytes(string_to_write,'UTF-8'))
-        print("sleeping now")
-        time.sleep(4)   #time running in the arduino code. Modify if needed
-        print("post_sleep")
-        no_more_data = False
-
-        #this is a serious cludge:
-        all_data = ""
-
-        while not no_more_data:
-            #print("going")
-            time.sleep(0.1)
-            data_left = s.inWaiting()
-            if (data_left >0): 
-                all_data += s.read(data_left).decode()
-            else:
-                no_more_data = True
-
-        print(all_data)
-        x = all_data
-        #x = x[1]
-        #print(x)
-        x = x.split("&")
-        x = x[:-1]
-        bins=[]
-        for y in x:
-            parts = y.split(":")
-            #print(parts[0])
-            #print(parts[1])
-            bins.append((int(parts[0]),int(parts[1])))
-
-        #for random testing:
-        #voltage = [3.3*random.random() for x in range(len(names))]
-        print (bins)
-        node_voltage = list()
-        time_x = list()
-        count = 0
-
-        #Create place holders when all is not called
-        #organizing to operate different modes
-        old_voltage = [0]*128  #create a list of zeros of 128 elements
-        for y in bins:
-            old_voltage[y[0]] = 3.3*y[1]/1023
-
-        old_names = list(range(128))
-
-        #print (old_names)
-
-        #Reorganizing orders to match with the breadboard layout
-        names = list()
-        voltage = list()
-        for i in old_names:
-            index = old_names.index(i)
-            if index >= 62:
-                if index == 125:
-                    names.append(63)
-                    voltage.append(old_voltage[63])
-                elif index == 124:
-                    names.append(62)
-                    voltage.append(old_voltage[62])
-                elif (index == 126):
-                    names.append(127)
-                    voltage.append(old_voltage[127])
-                elif (index == 127):
-                    names.append(126)
-                    voltage.append(old_voltage[126])
-                else:
-                    names.append(i + 2)
-                    voltage.append(old_voltage[index + 2])
-            else:
-                names.append(i)
-                voltage.append(old_voltage[index])
-
-        #print (names)
-        #print (voltage)
-
-        #colors = ["#F1EEF6", "#D4B9DA", "#C994C7", "#DF65B0", "#DD1C77", "#980043"]    
-        colors = [color_getter(v,3.3) for v in voltage]
-        #print (colors)
-        source = ColumnDataSource(
-            data = dict(
-                x=BB_x,
-                y=BB_y,
-                color=colors,
-                name=names,
-                voltage=voltage,
-            )
-        )
-
-
-        #output_file("bb_test_{}.html".format(current), title="Breadboard Visualizer v1.0")
-
-        TOOLS="hover,save"
-
-        p = figure(title="Breadboard Voltages", tools=TOOLS)
-        p.toolbar.logo=None
-        #print(pixel_scaler*image_width)
-        #print(pixel_scaler*image_height)
-
-        p.patches('x', 'y',
-            fill_color='color', fill_alpha=0.7,
-            line_color="white", line_width=0.0,
-            source=source)
-        p.xgrid.grid_line_color = None
-        p.ygrid.grid_line_color = None
-
-        p.plot_height=int(pixel_scaler*image_height)
-        p.plot_width=int(pixel_scaler*image_width)
-
-        hover = p.select(dict(type=HoverTool))
-        hover.point_policy = "follow_mouse"
-        hover.tooltips = OrderedDict([
-            ("Name", "@name"),
-            ("Voltage)", "@voltage V"),
-        ])
+       # prepare some data
+        x = [1, count, 3, 4, 5]
+        y = [6, 7, 2, 4, 5]
+        count +=1 
+        # output to static HTML file
+        #output_file("lines.html", title="line plot example")
         
+        # create a new plot with a title and axis labels
+        p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
+        
+        # add a line renderer with legend and line thickness
+        p.line(x, y, legend="Temp.", line_width=2) 
         script, div = components(p)
         prep = script + div
 
         #val1 = amp1*math.sin(omega1*time.time())
         #val2 = amp2*math.sin(omega2*time.time())
         socketio.emit('update_{}'.format(unique),prep,broadcast =True)
+        print(prep)
         print('sending')
+        time.sleep(1)
 
 @app.route('/')
 def index():
