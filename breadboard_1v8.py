@@ -17,6 +17,10 @@ import time
 import matplotlib.pyplot as plt
 import sys
 
+import numpy as np
+
+from datetime import datetime
+
 def serial_ports():
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in list(range(256))]
@@ -163,6 +167,8 @@ try:
             string_to_write = string_to_write[1]
             string_to_write = string_to_write.split("*")
             sampling_rate = float(string_to_write[0])
+            duration = 2000000  #in microsceconds (if this need to be change, must also change in the teensy code)
+            data_size = int(duration/(1000000*interval))   #conversion step to microseconds
             interval = 1/sampling_rate
             print (interval)
             node_position = bins[0][0]
@@ -170,11 +176,26 @@ try:
                 node_voltage.append(y[1]*3.3/1023)
                 time_x.append(interval*count)
                 count += 1
-            print (time_x.index(time_x[-1]))
+            #print (time_x.index(time_x[-1]))
+            
+            #this block is to analyze the source frequency of the signal
+            ta_data = np.array(node_voltage)
+            w = np.fft.fft(ta_data)
+            freqs = np.fft.fftfreq(len(w))
+            idx = np.argmax(np.abs(w))  #find the peak in the coefficients
+            freq = freqs[idx]
+            freq_hertz = abs(freq*sampling_rate)
+            print(freq_hertz)
+            disp_freq = String(freq_hertz)
+
+            #Setting up for bokeh graphing
             output_file("graphic.html")
             Tools = 'box_zoom,box_select,crosshair,hover,resize,reset,zoom_out,zoom_in'
             plot = figure(title = "Voltage vs Time",plot_width = 600,plot_height = 600, tools = Tools)
             plot.line(time_x,node_voltage,line_width=2)
+            plot.add_layout(Title(text="Time(seconds)",align="center"),"below")
+            plot.add_layout(Title(text="Voltage(V)",align="left"),"left")
+            plot.add_layout(Title(text=disp_freq,align="center"),"right")
             request_2 = input("Show?(y/n): ")
             if request_2 == "y":
                 show(plot)
@@ -232,9 +253,9 @@ try:
             )
 
 
-            output_file("bb_test_1.html", title="Breadboard Visualizer v1.0")
+            output_file("bb_test_{}.html".format(str(datetime.now()), title="Breadboard Visualizer v1.0"))
 
-            TOOLS="pan,wheel_zoom,box_zoom,reset,hover,save"
+            TOOLS = "pan,wheel_zoom,box_zoom,reset,hover,save"
 
             p = figure(title="Breadboard Voltages", tools=TOOLS)
             p.toolbar.logo=None
