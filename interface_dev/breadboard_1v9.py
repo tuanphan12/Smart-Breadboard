@@ -284,7 +284,7 @@ def dataThread():
 
         p.plot_height=int(pixel_scaler*image_height)
         p.plot_width=int(pixel_scaler*image_width)
-
+        p.axis.visible = False
         hover = p.select(dict(type=HoverTool))
         hover.point_policy = "follow_mouse"
         hover.tooltips = OrderedDict([
