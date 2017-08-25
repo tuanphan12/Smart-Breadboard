@@ -25,6 +25,8 @@ from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, emit, join_room, leave_room,close_room, rooms, disconnect
 from datetime import datetime
 
+import serial.tools.list_ports
+
 def serial_ports():
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in list(range(256))]
@@ -163,10 +165,31 @@ thread = None
 
 def dataThread():
     unique = 456
+
     ports = serial_ports() #generate list of currently connected serial ports 
     print (ports)
-    ser = ports[1]
+    ser = ports[0]
     s = serial.Serial(ser)
+
+    # teensy_port = list(serial.tools.list_ports.grep("Teensy"))
+    # if len(teensy_port) == 1:
+    #     print("Automatically found Teensy: {}".format(teensy_port[0].description))
+    # else:
+    #     ports = list(serial.tools.list_ports.comports())
+    #     port_dict = {i:[ports[i],ports[i].vid] for i in range(len(ports))}
+    #     teensy_id=None
+    #     for p in port_dict:
+    #         print("{}:   {} (Vendor ID: {})".format(p,port_dict[p][0],port_dict[p][1]))
+    #         if port_dict[p][1]==5824:
+    #             teensy_id = p
+    #     if teensy_id== None:
+    #         print("No Teensy Found!")
+    #     else:
+    #         print("Teensy Found: Device {}".format(p))
+    #         port = port_dict[teensy_id] 
+
+    # s = serial.Serial(format(p))
+
     print(s)
     print("ALL GOOD")
     while True:
