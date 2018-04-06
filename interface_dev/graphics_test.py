@@ -163,11 +163,13 @@ thread = None
 
 def dataThread():
     unique = 456
+
     ports = serial_ports() #generate list of currently connected serial ports 
     print (ports)
-    ser = ports[1]
+    ser = ports[0]
     s = serial.Serial(ser)
     print(s)
+
     print("ALL GOOD")
     count = 0
     while True:
@@ -189,7 +191,7 @@ def dataThread():
         #val1 = amp1*math.sin(omega1*time.time())
         #val2 = amp2*math.sin(omega2*time.time())
         socketio.emit('update_{}'.format(unique),prep,broadcast =True)
-        print(prep)
+        #print(prep)
         print('sending')
         time.sleep(1)
 

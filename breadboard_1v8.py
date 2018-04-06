@@ -168,8 +168,8 @@ try:
             string_to_write = string_to_write.split("*")
             sampling_rate = float(string_to_write[0])
             duration = 2000000  #in microsceconds (if this need to be change, must also change in the teensy code)
-            data_size = int(duration/(1000000*interval))   #conversion step to microseconds
             interval = 1/sampling_rate
+            data_size = int(duration/(1000000*interval))   #conversion step to microseconds
             print (interval)
             node_position = bins[0][0]
             for y in bins:
